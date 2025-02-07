@@ -1,4 +1,4 @@
-from core.video_processor import VideoProcessor
+from core import VideoProcessor
 
 def main():
     print("Starting the video processor.")
@@ -8,3 +8,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -111,7 +111,7 @@ class SceneExtractor:
         frame_count = scene.start_frame
         corner_counter = {}
         
-        while cap.isOpened() and frame_count < scene.end_frame:
+        while cap.isOpened() and frame_count <= scene.end_frame:
             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count)
             ret, frame = cap.read()
             
