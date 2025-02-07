@@ -1,0 +1,28 @@
+venv
+data
+.env
+TODO.txt
+
+# YOLO model files
+*.pt
+# yolov8m.pt
+# yolov8s.pt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# IDE settings
+.idea/
+.vscode/
+
+# Logs and databases
+*.log
+*.sqlite

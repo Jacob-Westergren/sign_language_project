@@ -1,0 +1,29 @@
+data:
+  base_dir: "data\\programs"
+  org_video_dir: "org_video"        
+  extracted_scenes_dir: "scenes"      
+  cropped_video_dir: "cropped_video"  
+  program_to_extract: "2001345"
+# - data
+#   - programs
+#     - program_A
+#       - episode 1
+#         - org_video --> original mp4 or gzip frames
+#         - scenes
+#          - scene_0  --> gziped cropped frames for scene 0
+#          - scene_1  --> gziped cropped frames for scene 0
+#     - program_B
+#       - ...
+#     - ...
+
+  
+scene_extraction:
+  subtitle_time_threshold: 4
+  YOLO_model: yolov8s.pt
+  tracking_model: bytetrack.yaml
+
+masking:
+  mask_ratio: 0.05
+
+scene_detection:
+  threshold: 0.05
