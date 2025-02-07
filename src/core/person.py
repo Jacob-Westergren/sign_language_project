@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 @dataclass
-class Detected_Person:
+class DetectedPerson:
     crop: tuple[int,int,int,int]
     start_frame: int
     end_frame: int = None

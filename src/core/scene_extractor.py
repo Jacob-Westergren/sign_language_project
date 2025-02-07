@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from typing import List, Optional, Dict
 from .scene import Scene
-from .detected_person import Detected_Person
+from .person import DetectedPerson
 from pathlib import Path
 from ultralytics import YOLO
 
@@ -54,7 +54,7 @@ class SceneExtractor:
             if box_id in corner_counter:
                 corner_counter[box_id].update(frame_count)
             else:
-                corner_counter[box_id] = Detected_Person(
+                corner_counter[box_id] = DetectedPerson(
                     start_frame=frame_count,
                     crop=crop_coords,
                 )
@@ -65,7 +65,7 @@ class SceneExtractor:
         scene: Scene,
         fps: int,
         time_jump: int
-    ) -> Optional[Detected_Person]:
+    ) -> Optional[DetectedPerson]:
         """Find the interpreter with highest frequency meeting minimum requirements"""
         if not corner_counter:
             print(f"For frame {scene.start_frame, scene.end_frame}, found no interpreter.")
@@ -157,7 +157,7 @@ class SceneExtractor:
         """
         Play frames from a scene folder
         """
-        # frame_files = sorted(os.listdir(folder_path))  # Sort to maintain order
+        # frame_files = sorted(os.listdir(folder_path))  
         folder = Path(folder_path)
         frame_files = sorted(folder.iterdir())  # Sort to maintain order
         frame_delay = 1 / fps  # Calculate delay in seconds
