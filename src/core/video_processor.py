@@ -1,7 +1,7 @@
-import os
+import json
 import yaml
-from typing import List
-from .scene import Scene
+import time
+from pathlib import Path
 from .scene_extractor import SceneExtractor
 
 class VideoProcessor:
@@ -14,29 +14,44 @@ class VideoProcessor:
             return yaml.safe_load(file)
 
     def process_episodes(self):
-        program_path = os.path.join(
-            self.config["data"]["base_dir"], 
-            f"{self.config['data']['program_to_extract']}"
-        )
+        program_path = Path(self.config["data"]["base_dir"]) / self.config['data']['program_to_extract']
+        print(f"Processing programs from: {program_path}")
 
-        episode_files = [f for f in os.listdir(f"{program_path}\\1234") if f.endswith('.mp4')]
-        print(f"Episodes: {episode_files}")
+        # episode_files = [f for f in os.listdir(f"{program_path}\\1234") if f.endswith('.mp4')]
+        episodes_paths = list(program_path.rglob('*.mp4'))   # r for recursive glob
+        print(f"The found episodes are: {episodes_paths}, where each episode is of type: {type(episodes_paths[0])}")
 
-        for episode in episode_files:
-            self.process_single_episode(program_path, episode)
+        for episode_path in episodes_paths:
+            print(f"Processing episode {episode_path.stem}, Episode path is: {episode_path}")
+            self.process_single_episode(episode_path)
 
-    def process_single_episode(self, program_path: str, episode: str):
-        episode_dir = os.path.join(program_path, f"{episode.split('.')[0]}")
-        os.makedirs(episode_dir, exist_ok=True)
+    def process_single_episode(self, episode_path: Path):
+        scenes = self.scene_extractor.extract_scenes(episode_path)
+        
+        # Create a list of scene data for JSON
+        scenes_data = []
 
-        print(f"Processing Episode {episode.split('.')[0]}")
-        scenes = self.scene_extractor.extract_scenes(episode)
-
+        # Process each scene
         for scene in scenes:
+            time_start = time.time()
             print(f"Processing Scene {scene.id}")
-            self.scene_extractor.extract_cropped_interpreter_frames(
-                episode_dir,
-                episode,
+            scene_data = self.scene_extractor.extract_cropped_interpreter_frames(
+                episode_path,
                 scene
             )
+            if scene_data:
+                scenes_data.append(scene_data)
+            time_end = time.time()
+            print(f"Time taken to process scene {scene.id}: {time_end - time_start} seconds")
+        print(f"Found {len(scenes_data)} scenes with interpreters")
+
+        time_start = time.time()
+        # Save scenes data to JSON file next to the video file
+        json_path = episode_path.parent / 'scenes.json'
+        with open(json_path, 'w') as f:
+            json.dump({"scenes": scenes_data}, f, indent=4)
+
+        print(f"Saved scene information to {json_path}")
+        time_end = time.time()
+        print(f"Time taken to save scene information to {json_path}: {time_end - time_start} seconds")
 

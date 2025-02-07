@@ -105,7 +105,7 @@ def extract_scenes(video_path, scenes_timestamps, output_dir, padding=4):
             out.write(frame)
             
     cap.release()
-
+ 
 def play_scene_folder(folder_path, fps=30):
     frame_files = sorted(os.listdir(folder_path))  # Sort to maintain order
     frame_delay = 1 / fps  # Calculate delay in seconds
@@ -121,9 +121,6 @@ def play_scene_folder(folder_path, fps=30):
             break
     
     cv2.destroyAllWindows()  # Close window after playback
-
-# !IMPORTANT!: Just store the json containing the start and end frame for each scene, and then a single universal crop for all scenes in 
-# the episode, with a standard size across all programs.
 
 def extract_cropped_interpreter_frames(
         episode_dir: str, 
@@ -196,6 +193,8 @@ def extract_cropped_interpreter_frames(
 
     # find the mean crop size
     x1,y1,x2,y2 = interpreter.crop
+
+    # Just store the frames and crop in a json
 
     # Move to first frame where the interpreter was found
     frame_count = interpreter.start_frame
