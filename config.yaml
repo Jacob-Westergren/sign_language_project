@@ -16,11 +16,18 @@ data:
 #       - ...
 #     - ...
 
-  
 scene_extraction:
   subtitle_time_threshold: 4
   YOLO_model: yolov8s.pt
   tracking_model: bytetrack.yaml
+
+cloud_services:
+  aurora_stuff: "aurora-stuff"
+  Rook_Ceph_bucket_name: "rok-ceph-bucket"
+  Rook_Ceph_access_key: "rok-ceph-access-key"
+  Rook_Ceph_secret_key: "rok-ceph-secret-key"
+  storage_settings: "storage-settings"
+  
 
 masking:
   mask_ratio: 0.05

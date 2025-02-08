@@ -2,18 +2,28 @@ import json
 import yaml
 import time
 from pathlib import Path
+from typing import List
 from .scene_extractor import SceneExtractor
+from .scene import Scene, SceneData
 
 class VideoProcessor:
-    def __init__(self, config_path: str = 'config.yaml'):
-        self.config = self.load_config(config_path)
+    def __init__(
+        self, 
+        config_path: str = 'config.yaml'
+    ) -> None:
+        self.config = self._load_config(config_path)
         self.scene_extractor = SceneExtractor(self.config['scene_extraction']['YOLO_model'])
 
-    def load_config(self, config_path: str) -> dict:
+    def _load_config(
+        self, 
+        config_path: str
+    ) -> dict:
         with open(config_path, 'r') as file:
             return yaml.safe_load(file)
 
-    def process_episodes(self):
+    def process_episodes(
+        self
+    ) -> None:
         program_path = Path(self.config["data"]["base_dir"]) / self.config['data']['program_to_extract']
         print(f"Processing programs from: {program_path}")
 
@@ -25,13 +35,13 @@ class VideoProcessor:
             print(f"Processing episode {episode_path.stem}, Episode path is: {episode_path}")
             self.process_single_episode(episode_path)
 
-    def process_single_episode(self, episode_path: Path):
-        scenes = self.scene_extractor.extract_scenes(episode_path)
+    def process_single_episode(
+        self, 
+        episode_path: Path
+    ) -> None:
+        scenes: List[Scene] = self.scene_extractor.extract_scenes(episode_path)
         
-        # Create a list of scene data for JSON
-        scenes_data = []
-
-        # Process each scene
+        scenes_data: List[SceneData] = []
         for scene in scenes:
             time_start = time.time()
             print(f"Processing Scene {scene.id}")

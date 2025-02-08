@@ -83,8 +83,10 @@ class SceneExtractor:
                   f"or too low frequency with {interpreter.freq if interpreter else 0}.")
             return None
 
-    def extract_scenes(self, 
-                       video_path: Path) -> List[Scene]:
+    def extract_scenes(
+        self, 
+        video_path: Path
+        ) -> List[Scene]:
         """
         Extract scenes from a video file
         Currently returns dummy data - implement actual scene detection later
@@ -116,7 +118,8 @@ class SceneExtractor:
             ret, frame = cap.read()
             
             if not ret:
-                print(f"Exited scene at frame {frame_count} as there's no more frames.")
+                print(f"Exited scene at frame {frame_count} as there's no more frames. 
+                      Probably an error in extract scenes function.")
                 break
 
             detections = self._detect_interpreter_in_frame(frame, width)
@@ -153,27 +156,24 @@ class SceneExtractor:
         cap.release()
         """
 
-    def play_scene_folder(self, folder_path: str, fps: int=30):
+    def play_scene_folder(
+        self, 
+        folder_path: Path,
+        fps: int=30):
         """
         Play frames from a scene folder
         """
-        # frame_files = sorted(os.listdir(folder_path))  
-        folder = Path(folder_path)
-        frame_files = sorted(folder.iterdir())  # Sort to maintain order
+        frame_files = sorted(folder_path.iterdir())  # Sort to maintain order
         frame_delay = 1 / fps  # Calculate delay in seconds
 
-        #for frame_file in frame_files:
-        #    frame_path = os.path.join(folder_path, frame_file)
-        #     frame = cv2.imread(frame_path)  # Read frame
         for frame_path in frame_files:
-            frame = cv2.imread(str(frame_path))  # Read frame
-            
-            cv2.imshow("Video Playback", frame)  # Display frame
+            frame = cv2.imread(str(frame_path)) 
+            cv2.imshow("Video Playback", frame)
 
             # Wait for (1000 / fps) ms, exit if 'q' is pressed
             if cv2.waitKey(int(frame_delay * 1000)) & 0xFF == ord('q'):
                 break
         
-        cv2.destroyAllWindows()  # Close window after playback
+        cv2.destroyAllWindows()  
 
 

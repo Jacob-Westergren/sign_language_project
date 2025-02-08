@@ -6,3 +6,4 @@ torch
 torchvision
 torchaudio
 ultralytics
+boto3

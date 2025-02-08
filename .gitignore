@@ -1,7 +1,11 @@
 venv
-data
 .env
+.env.*
+!.env.example
+data
 TODO.txt
+src_rust
+
 
 # YOLO model files
 *.pt
