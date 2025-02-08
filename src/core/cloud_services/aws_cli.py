@@ -48,19 +48,21 @@ def download_directory_from_s3(
     subprocess.run(cmd, shell=True)
     print(f"Downloaded all files from s3://{bucket_name} to {output_dir}")
 
-def list_files(
+def list_files_in_s3(
     bucket_name: str
 ) -> list[str]:
     # run the command and store it as a string
+
     cmd = f"aws s3 ls s3://{bucket_name}"
     output = subprocess.check_output(cmd, shell=True).decode("utf-8") 
 
     # split the output into a list of strings, where each string is a line of the output
     return output.split("\n")   
 
-def list_buckets() -> list[str]:
+def list_buckets_in_s3() -> list[str]:
     # run the command and store it as a string
     cmd = "aws s3 ls"
     output = subprocess.check_output(cmd, shell=True).decode("utf-8")
     return output.split("\n")
+
 

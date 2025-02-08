@@ -1,8 +1,7 @@
 import cv2
 import numpy as np
 from typing import List, Optional, Dict
-from .scene import Scene
-from .person import DetectedPerson
+from ..models import Scene, DetectedPerson
 from pathlib import Path
 from ultralytics import YOLO
 
@@ -118,8 +117,8 @@ class SceneExtractor:
             ret, frame = cap.read()
             
             if not ret:
-                print(f"Exited scene at frame {frame_count} as there's no more frames. 
-                      Probably an error in extract scenes function.")
+                print(f"Exited scene at frame {frame_count} as there's no more frames. "
+                      f"Probably an error in extract scenes function.")
                 break
 
             detections = self._detect_interpreter_in_frame(frame, width)
