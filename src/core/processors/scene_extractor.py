@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from typing import List, Optional, Dict
-from ..models import Scene, DetectedPerson
+from ..structures import Scene, DetectedPerson
 from pathlib import Path
 from ultralytics import YOLO
 

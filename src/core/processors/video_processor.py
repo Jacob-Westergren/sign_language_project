@@ -4,15 +4,14 @@ import time
 from pathlib import Path
 from typing import List
 from .scene_extractor import SceneExtractor
-from ..models.scene import Scene, SceneData
-from ..utils.config import load_config
+from ..structures import Scene, SceneData
+from ..utils import load_config
 
 class VideoProcessor:
     def __init__(
         self, 
         config_path: str = 'config.yaml'
     ) -> None:
-
         self.config = load_config(config_path)
         self.scene_extractor = SceneExtractor(self.config['scene_extraction']['YOLO_model'])
 
