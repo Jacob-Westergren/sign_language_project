@@ -61,7 +61,7 @@ project_root/
    - Default output format (recommend: json)
 
 ### YOLO Model
-1. Download the required YOLO model (yolov8s.pt) and place it in the project root.
+1. Download the required YOLO model (ex. yolov8s.pt) and place it in the project root.
 
 ## Configuration
 
@@ -94,6 +94,9 @@ project_root/
 ## Output Format
 
 ### Scene JSON Structure
+The `interpreter_crop` array contains the bounding box coordinates of the detected interpreter in the format:
+[bottom_left_x, bottom_left_y, top_right_x, top_right_y]
+
 ```json
 {
     "scenes": [
@@ -101,38 +104,13 @@ project_root/
             "scene_id": 1,
             "start_frame": 0,
             "end_frame": 240,
-            "interpreter_crop": [x1, y1, x2, y2],
+            "interpreter_crop": [100, 100, 200, 200],
             "interpreter_frequency": 5
         }
     ]
 }
 ```
 
-## Development
-
-### Running Tests
-```bash
-python -m pytest tests/
-```
-
-### Code Style
-This project follows PEP 8 guidelines. Run linting with:
-```bash
-flake8 src/
-```
-
-## License
-
-[Your License Here]
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
 ## Contact
 
-[Your Contact Information]
+jacob.westergren@svt.se
