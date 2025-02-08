@@ -85,7 +85,7 @@ class SceneExtractor:
     def extract_scenes(
         self, 
         video_path: Path
-        ) -> List[Scene]:
+    ) -> List[Scene]:
         """
         Extract scenes from a video file
         Currently returns dummy data - implement actual scene detection later
@@ -158,7 +158,8 @@ class SceneExtractor:
     def play_scene_folder(
         self, 
         folder_path: Path,
-        fps: int=30):
+        fps: int=30
+    ) -> None:
         """
         Play frames from a scene folder
         """
