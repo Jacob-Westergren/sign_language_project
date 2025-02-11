@@ -5,6 +5,7 @@ venv
 data
 TODO.txt
 src_rust
+outputs
 
 
 # YOLO model files
