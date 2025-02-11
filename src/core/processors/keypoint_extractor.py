@@ -2,15 +2,11 @@ import mediapipe as mp
 import cv2
 import numpy as np
 from pathlib import Path
-from ..structures.scene import SceneData
+from ..structures import SceneData
 from omegaconf import DictConfig
 from ..utils import timing
 from typing import Tuple
-
-from pose_format import Pose
 from pose_format.utils.holistic import load_holistic
-from pose_format.utils.openpose import load_openpose_directory
-from pose_format.pose_visualizer import PoseVisualizer
 
 mp_holistic = mp.solutions.holistic
 FACEMESH_CONTOURS_POINTS = [str(p) for p in sorted(set([p for p_tup in list(mp_holistic.FACEMESH_CONTOURS) for p in p_tup]))]
@@ -78,7 +74,7 @@ class KeypointExtractor:
         cap = cv2.VideoCapture(video_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
         frames = self._load_video_frames(cap, scene_data["start_frame"], scene_data["end_frame"], scene_data["interpreter_crop"])
-        
+
         x1, y1, x2, y2 = scene_data["interpreter_crop"]
         pose = load_holistic(frames, fps=fps, width=(x2-x1), height=(y2-y1), progress=True, 
                              additional_holistic_config=self.holistic_config)

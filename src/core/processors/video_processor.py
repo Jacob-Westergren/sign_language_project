@@ -3,8 +3,6 @@ from pathlib import Path
 from typing import List
 from .scene_extractor import SceneExtractor
 from ..structures import Scene, SceneData
-from ..utils import load_config
-from .feature_extractor import FeatureExtractor
 from omegaconf import DictConfig
 from .keypoint_extractor import KeypointExtractor
 
@@ -51,8 +49,11 @@ class VideoProcessor:
         self, 
         episode_path: Path
     ) -> None:
-        scenes: List[Scene] = self.scene_extractor.extract_scenes(episode_path)
-        
+        subtitle_metadata_path = episode_path.parent / "subtitle_metadata.json"
+        scenes: List[Scene] = self.scene_extractor.extract_scenes(subtitle_metadata_path)
+        print(f"Scenes:")
+        for scene in scenes: print(f"scene {scene.id}: ({scene.start_frame}, {scene.end_frame})")
+
         scenes_data: List[SceneData] = []
         for scene in scenes:
             scene_data = self.scene_extractor.extract_cropped_interpreter_frames(
@@ -62,6 +63,7 @@ class VideoProcessor:
             if scene_data:
                 scenes_data.append(scene_data)
         print(f"Found {len(scenes_data)} scenes with interpreters")
+
         # Save scenes data to JSON file next to the video file
         json_path = episode_path.parent / 'scenes.json'
         with open(json_path, 'w') as f:

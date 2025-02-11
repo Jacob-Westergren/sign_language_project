@@ -7,6 +7,8 @@ from ultralytics import YOLO
 import torch
 from ..utils import timing
 from ..structures import SceneData
+import json
+
 class SceneExtractor:
     def __init__(
         self, 
@@ -41,8 +43,8 @@ class SceneExtractor:
         human_detections = [result for result in results if result.boxes.cls == 0.]
         for detected in human_detections:
             x1, y1, x2, y2 = map(int, detected.boxes.xyxy[0])
-            
-            if (y1 < 350 and (x1 < 50)) or (y1 < 350 and (x2 > width - 50)):
+                # and x2 < 100         and (x2 > width - 100)
+            if (y1 < 350) or (y1 < 350):
                 box_id = detected.boxes.id
                 if box_id is not None:
                     interpreter_detections.append((int(box_id), (x1, y1, x2, y2)))
@@ -91,12 +93,21 @@ class SceneExtractor:
 
     def extract_scenes(
         self, 
-        video_path: Path
+        subtitle_metadata_path: Path
     ) -> List[Scene]:
         """
         Extract scenes from a video file
         Currently returns dummy data - implement actual scene detection later
         """
+        print(f"subtitle path is: {subtitle_metadata_path}")
+        with open(subtitle_metadata_path, 'r') as file:
+            subtitle_metadata = json.load(file)  
+        
+        scenes = [
+            Scene(id=scene_id, start_frame=scene['start_frame'], end_frame=scene['end_frame'])
+            for scene_id, scene in enumerate(subtitle_metadata['subtitle'])
+        ]
+        return scenes
         # Temporary hardcoded scenes for testing
         return [
             Scene(id=1, start_frame=0, end_frame=30*8),
@@ -116,6 +127,7 @@ class SceneExtractor:
         """
         with timing(f"Processing Scene {scene.id}"):
             cap, fps, width = self._setup_video_capture(episode_path)
+            print(f"The video's fps is {fps}")
             
             frame_count = scene.start_frame
             corner_counter = {}

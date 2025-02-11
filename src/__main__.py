@@ -18,29 +18,29 @@ def main(cfg: DictConfig) -> None:
 
 if __name__ == "__main__":
     
-    #main()
-    file = Path("data/programs/2001345/1234/poses/scene_1.pose")
-    with open(file, 'rb') as pose_file:
-        pose = Pose.read(pose_file.read())  
-    
-    print(pose)
-    pose_visualizer = PoseVisualizer(pose)
-    plain_video = pose_visualizer.draw_on_video("data/programs/2001345/1234/1234.mp4", max_frames=30*8)
+    main()
 
-    # Visualize the frames
-    for frame in plain_video:
-        cv2.imshow("Pose Visualization", frame)
+    if True:
+        for i in range(12):
+            try:
+                file = Path(f"data/programs/3001345/2345/poses/scene_{i}.pose") # this has higher x1 and x2 since it's on right side, 
+                with open(file, 'rb') as pose_file:
+                    pose = Pose.read(pose_file.read())  
+                
+                pose_visualizer = PoseVisualizer(pose)
+                plain_video = pose_visualizer.draw(max_frames=30*10)
+                #plain_video = pose_visualizer.draw_on_video("data/programs/3001345/2345/Rapport_Sample.mp4", max_frames=30*10)
+
+                # Visualize the frames
+                for frame in plain_video:
+                    cv2.imshow("Pose Visualization", frame)
+                    
+                    # 1ms delay between frames
+                    if cv2.waitKey(1) & 0xFF == ord('q'):  
+                        break
+            except:
+                print(f"No scene {i}, skipping.")
+                continue
         
-        # 1ms delay between frames
-        if cv2.waitKey(1) & 0xFF == ord('q'):  
-            break
-
-    # Release resources and close windows
-    cv2.destroyAllWindows()
-
-"""
-FPS: 30.0
-Data: <class 'numpy.ma.core.MaskedArray'> (240, 1, 203, 3), float32
-Confidence shape: <class 'numpy.ndarray'> (240, 1, 203), float32
-Duration (seconds): 8.0
-"""
+        # Release resources and close windows
+        cv2.destroyAllWindows()
