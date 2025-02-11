@@ -1,0 +1,16 @@
+defaults:
+  - _self_
+  - data: default
+  - model/yolo
+  - model/feature_extractor
+  - model/keypoint_extractor
+  - cloud: aws
+
+scene_extraction:
+  subtitle_time_threshold: 4
+
+masking:
+  mask_ratio: 0.05
+
+scene_detection:
+  threshold: 0.05

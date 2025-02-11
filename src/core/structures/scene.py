@@ -8,7 +8,7 @@ class Scene:
     end_frame: int
 
 class SceneData(TypedDict):
-    scene_id: int
+    id: int
     start_frame: int
     end_frame: int
     interpreter_crop: Tuple[int, int, int, int]

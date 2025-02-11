@@ -36,6 +36,10 @@ project_root/
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
+   Note: If you get a "FullyQualifiedErrorId" when running the activate command in powershell, execute the following command:
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+   ```
 
 2. Install dependencies:
    ```bash

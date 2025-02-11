@@ -1,0 +1,6 @@
+mediapipe:
+  static_image_mode: false
+  model_complexity: 2
+  min_detection_confidence: 0.75
+  refine_face_landmarks: true
+  minimum_length: 6

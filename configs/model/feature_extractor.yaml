@@ -1,0 +1,4 @@
+dinov2:
+  model_name: "facebook/dinov2-small"
+  output_layer: "last_hidden_state"
+  minimum_sequence_length: 6

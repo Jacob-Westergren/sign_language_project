@@ -4,13 +4,20 @@ from typing import List, Optional, Dict
 from ..structures import Scene, DetectedPerson
 from pathlib import Path
 from ultralytics import YOLO
-
+import torch
+from ..utils import timing
+from ..structures import SceneData
 class SceneExtractor:
     def __init__(
         self, 
         yolo_model_path: str
     ) -> None:
-        self.yolo_model = YOLO(yolo_model_path)
+        # Check if CUDA is available
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        print(f"Using device: {self.device}")
+ 
+        # Load model to specified device
+        self.yolo_model = YOLO(yolo_model_path)#.to(self.device)
 
     def _setup_video_capture(
         self, 
@@ -107,35 +114,35 @@ class SceneExtractor:
         Extract and crop interpreter frames from a specific scene
         Returns scene metadata if interpreter is found in >= 60% of frames
         """
-        cap, fps, width = self._setup_video_capture(episode_path)
-        
-        frame_count = scene.start_frame
-        corner_counter = {}
-        
-        while cap.isOpened() and frame_count <= scene.end_frame:
-            cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count)
-            ret, frame = cap.read()
+        with timing(f"Processing Scene {scene.id}"):
+            cap, fps, width = self._setup_video_capture(episode_path)
             
-            if not ret:
-                print(f"Exited scene at frame {frame_count} as there's no more frames. "
-                      f"Probably an error in extract scenes function.")
-                break
+            frame_count = scene.start_frame
+            corner_counter = {}
+            
+            while cap.isOpened() and frame_count <= scene.end_frame:
+                cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count)
+                ret, frame = cap.read()
+                
+                if not ret:
+                    print(f"Exited scene at frame {frame_count} as there's no more frames. "
+                          f"Probably an error in extract scenes function.")
+                    break
 
-            detections = self._detect_interpreter_in_frame(frame, width)
-            self._process_frame_detections(detections, corner_counter, frame_count)
-            frame_count += fps * time_jump
+                detections = self._detect_interpreter_in_frame(frame, width)
+                self._process_frame_detections(detections, corner_counter, frame_count)
+                frame_count += fps * time_jump
 
-        interpreter = self._find_main_interpreter(corner_counter, scene, fps, time_jump)
-        
-        if interpreter:
-            return {
-                "scene_id": scene.id,
-                "start_frame": interpreter.start_frame,
-                "end_frame": interpreter.end_frame,
-                "interpreter_crop": interpreter.crop,
-                "interpreter_frequency": interpreter.freq
-            }
-        else:
+            interpreter = self._find_main_interpreter(corner_counter, scene, fps, time_jump)
+            
+            if interpreter:
+                return SceneData(
+                    id= scene.id,
+                    start_frame=interpreter.start_frame,
+                    end_frame=interpreter.end_frame,
+                    interpreter_crop=interpreter.crop,
+                    interpreter_frequency=interpreter.freq
+                )
             return None
 
         """

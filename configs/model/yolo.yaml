@@ -1,0 +1,4 @@
+yolo: 
+  model_name: "yolo11n.pt" 
+  tracking_model: "bytetrack.yaml"
+  min_detection_confidence: 0.75

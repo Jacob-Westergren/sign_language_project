@@ -1,0 +1,5 @@
+s3:
+  region: ${oc.env:AWS_REGION}
+  bucket: ${oc.env:ROK_BUCKET_NAME}
+  access_key: ${oc.env:ROK_BUCKET_ACCESS_KEY}
+  secret_key: ${oc.env:ROK_BUCKET_SECRET_KEY}

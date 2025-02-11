@@ -18,7 +18,7 @@ data:
 
 scene_extraction:
   subtitle_time_threshold: 4
-  YOLO_model: yolov8s.pt
+  YOLO_model: yolo11s.pt
   tracking_model: bytetrack.yaml
 
 cloud_services:

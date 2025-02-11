@@ -1,24 +1,42 @@
 import json
-import yaml
-import time
 from pathlib import Path
 from typing import List
 from .scene_extractor import SceneExtractor
 from ..structures import Scene, SceneData
 from ..utils import load_config
+from .feature_extractor import FeatureExtractor
+from omegaconf import DictConfig
+from .keypoint_extractor import KeypointExtractor
+
 
 class VideoProcessor:
     def __init__(
         self, 
-        config_path: str = 'config.yaml'
+        cfg: DictConfig
     ) -> None:
-        self.config = load_config(config_path)
-        self.scene_extractor = SceneExtractor(self.config['scene_extraction']['YOLO_model'])
+        self.cfg = cfg
+        print(cfg)
+
+        yolo_model_path = Path(self.cfg.model.yolo.model_name)
+        try:
+            print(f"Initializing scene extractor with model: {yolo_model_path}")
+            self.scene_extractor = SceneExtractor(str(yolo_model_path))
+        except FileNotFoundError:
+            raise FileNotFoundError(
+                f"\nError: YOLO model '{yolo_model_path.name}' not found.\n"
+                f"Please check your config.yaml and ensure the model file exists.\n"
+                f"Recommended models: yolo11n.pt, yolo11s.pt (n-nano, s-small)"
+            )
+        try:
+            self.keypoint_extractor = KeypointExtractor(self.cfg.model)
+        except Exception as e:
+            raise Exception(f"Error initializing keypoint extractor: {e}")
+
 
     def process_episodes(
         self
     ) -> None:
-        program_path = Path(self.config["data"]["base_dir"]) / self.config['data']['program_to_extract']
+        program_path = Path(self.cfg.data.base_dir) / self.cfg.data.program_to_extract
         print(f"Processing programs from: {program_path}")
 
         # episode_files = [f for f in os.listdir(f"{program_path}\\1234") if f.endswith('.mp4')]
@@ -37,25 +55,21 @@ class VideoProcessor:
         
         scenes_data: List[SceneData] = []
         for scene in scenes:
-            time_start = time.time()
-            print(f"Processing Scene {scene.id}")
             scene_data = self.scene_extractor.extract_cropped_interpreter_frames(
                 episode_path,
                 scene
             )
             if scene_data:
                 scenes_data.append(scene_data)
-            time_end = time.time()
-            print(f"Time taken to process scene {scene.id}: {time_end - time_start} seconds")
         print(f"Found {len(scenes_data)} scenes with interpreters")
-
-        time_start = time.time()
         # Save scenes data to JSON file next to the video file
         json_path = episode_path.parent / 'scenes.json'
         with open(json_path, 'w') as f:
             json.dump({"scenes": scenes_data}, f, indent=4)
 
         print(f"Saved scene information to {json_path}")
-        time_end = time.time()
-        print(f"Time taken to save scene information to {json_path}: {time_end - time_start} seconds")
 
+        # Extract keypoints from interpreter frames if scenes were found
+        if scenes_data:
+            self.keypoint_extractor.process_scenes(episode_path, scenes_data) 
+            
