@@ -26,6 +26,7 @@ class VideoProcessor:
                 f"Recommended models: yolo11n.pt, yolo11s.pt (n-nano, s-small)"
             )
         try:
+            print(f"Initializing Keypoint Extractor")
             self.keypoint_extractor = KeypointExtractor(self.cfg.model)
         except Exception as e:
             raise Exception(f"Error initializing keypoint extractor: {e}")
@@ -34,6 +35,7 @@ class VideoProcessor:
     def process_episodes(
         self
     ) -> None:
+        print(f"Reached process_episodes")
         program_path = Path(self.cfg.data.base_dir) / self.cfg.data.program_to_extract
         print(f"Processing programs from: {program_path}")
 

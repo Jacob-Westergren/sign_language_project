@@ -6,6 +6,9 @@ from pose_format.pose_visualizer import PoseVisualizer
 from pathlib import Path
 import cv2
 from pose_format import Pose
+import matplotlib.pyplot as plt
+
+
 # Load .env file so cfg can read env variables
 load_dotenv()
 
@@ -13,14 +16,15 @@ load_dotenv()
 def main(cfg: DictConfig) -> None:
     print("Starting the video processor.")
     processor = VideoProcessor(cfg)
+    print(f"Calling process_episodes.")
     processor.process_episodes()
     print("Finished the video processor.")
 
 if __name__ == "__main__":
-    
-    main()
+    print(f"Hello World!")
+    # main()
 
-    if True:
+    if False:
         for i in range(12):
             try:
                 file = Path(f"data/programs/3001345/2345/poses/scene_{i}.pose") # this has higher x1 and x2 since it's on right side, 
@@ -29,15 +33,22 @@ if __name__ == "__main__":
                 
                 pose_visualizer = PoseVisualizer(pose)
                 plain_video = pose_visualizer.draw(max_frames=30*10)
+
+                for frame in plain_video:
+                    plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+                    plt.axis('off')
+                    plt.show(block=False)
+                    plt.pause(0.001)
+                    plt.clf()
                 #plain_video = pose_visualizer.draw_on_video("data/programs/3001345/2345/Rapport_Sample.mp4", max_frames=30*10)
 
                 # Visualize the frames
-                for frame in plain_video:
-                    cv2.imshow("Pose Visualization", frame)
-                    
+                #for frame in plain_video:
+                #    cv2.imshow("Pose Visualization", frame)
+                #    
                     # 1ms delay between frames
-                    if cv2.waitKey(1) & 0xFF == ord('q'):  
-                        break
+                #    if cv2.waitKey(1) & 0xFF == ord('q'):  
+                #        break
             except:
                 print(f"No scene {i}, skipping.")
                 continue
