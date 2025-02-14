@@ -1,0 +1,6 @@
+[project]
+
+name="sign-feature-extractor"
+description = "Quantize Sign Language Poses"
+version = "0.0.1"
+author = "Jacob Westergren"

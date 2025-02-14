@@ -3,7 +3,7 @@ venv
 .env.*
 !.env.example
 data
-TODO.txt
+*.txt
 src_rust
 outputs
 

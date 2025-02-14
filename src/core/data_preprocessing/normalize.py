@@ -20,6 +20,17 @@ def shift_hand(pose: Pose, hand_component: str, wrist_name: str):
     pose.body.data[:, :, wrist_index: wrist_index + 21] = hand - wrist
 
 
+def unshift_hand(pose: Pose, hand_component: str):
+    # pylint: disable=protected-access
+    wrist_index = pose.header._get_point_index(hand_component, "WRIST")
+    hand = pose.body.data[:, :, wrist_index: wrist_index + 21]
+    body_wrist_name = "LEFT_WRIST" if hand_component == "LEFT_HAND_LANDMARKS" else "RIGHT_WRIST"
+    # pylint: disable=protected-access
+    body_wrist_index = pose.header._get_point_index("POSE_LANDMARKS", body_wrist_name)
+    body_wrist = pose.body.data[:, :, body_wrist_index: body_wrist_index + 1]
+    pose.body.data[:, :, wrist_index: wrist_index + 21] = hand + body_wrist
+
+
 def pre_process_mediapipe(pose: Pose):
     # Remove legs, simplify face
     pose = reduce_holistic(pose)
@@ -42,7 +53,8 @@ def pre_process_mediapipe(pose: Pose):
 def get_mean_and_std(directory: str):
     cumulative_sum, squared_sum, frames_count = None, None, None
 
-    for file in tqdm(list(Path(directory).glob("*.pose"))):
+    for file in (pbar := tqdm(list(directory.glob("*.pose")))):
+        pbar.set_description(f"Processing {file}")
         # Get the pose
         with open(file, 'rb') as pose_file:
             pose = Pose.read(pose_file.read())
@@ -60,26 +72,31 @@ def get_mean_and_std(directory: str):
         cumulative_sum = frames_sum if cumulative_sum is None else cumulative_sum + frames_sum
         squared_sum = frames_squared_sum if squared_sum is None else squared_sum + frames_squared_sum
         frames_count = num_unmasked_frames if frames_count is None else frames_count + num_unmasked_frames
-
+        
     mean = cumulative_sum / frames_count
     std = np.sqrt((squared_sum / frames_count) - np.square(mean))
 
     return mean, std
 
 
-def comp_mean_std(pose_dir: str, pose_norm_dir: str):
+def comp_mean_std(pose_dir: Path, pose_norm_dir: Path):
+    print(f"Calling get_mean_and_std")
     mean, std = get_mean_and_std(pose_dir)
 
-    # get a single random pose
-    random_pose_path = Path(pose_dir).glob("*.pose").__next__()
+    # get a single random pose, done to get the header object
+    random_pose_path = pose_dir.glob("*.pose").__next__()
     with open(random_pose_path, 'rb') as pose_file:
         pose = Pose.read(pose_file.read())
         pose = pre_process_mediapipe(pose)
 
-    # store header          WHAT IS HEADER?
+    # store header 
+    # - header is all metadata regarding the pose object, so like version and all components of the pose:
+    # PoseHeaderComponent: POSE_LANDMARKS (which in turn go to deeper dict levels of each point in the pose skeleton)
+    # PoseHeaderCOmponent: FACE_LANDMARKS (which in turn go to deeper dict levels for each point in the face)
     with open(Path(pose_norm_dir) / "header.poseheader", "wb") as f:
         pose.header.write(f)
-
+    
+    # Store the mean and std value of every point in header
     i = 0
     mean_std_info = {}
     for component in pose.header.components:
@@ -121,14 +138,23 @@ def normalize_mean_std(pose: Pose, pose_norm_dir: str):
     pose.body.data = (pose.body.data - mean) / std
     return pose
 
-def normalize_poses(pose_dir: str, zip_output_file: str):
-    pose_files = list(Path(pose_dir).glob("**.pose"))
+def unnormalize_mean_std(pose: Pose):
+    mean, std = load_mean_and_std()
+    pose.body.data = (pose.body.data * std) + mean
+    return pose
+
+def normalize_poses(pose_dir: str, pose_norm_dir: str, zip_output_file: str):
+    pose_files = list(Path(pose_dir).glob("*.pose"))
+    pose_norm_dir = Path(pose_norm_dir)
+    file_names = [file.name for file in pose_files]
+    print(f"Files to process are: {file_names}")
     with zipfile.ZipFile(zip_output_file, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-        for file in tqdm(pose_files):
+        for file in (pbar :=tqdm(pose_files)):
+            pbar.set_description(f"Processing file {file.name}")
             with open(file, 'rb') as pose_file:
                 pose = Pose.read(pose_file.read())
                 pose = pre_process_mediapipe(pose)
-                pose = normalize_mean_std(pose)
+                pose = normalize_mean_std(pose, pose_norm_dir)
 
                 npz_filename = file.stem + '.npz'            
 
