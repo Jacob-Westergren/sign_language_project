@@ -1,0 +1,8 @@
+base_dir: "data/programs"
+#program_to_extract: "2001345"   
+program_to_extract: "3001345"   
+
+directories:
+  org_video: "org_video"
+  extracted_scenes: "scenes"
+  cropped_video: "cropped_video"

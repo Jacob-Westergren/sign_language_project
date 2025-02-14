@@ -3,6 +3,7 @@ venv
 .env.*
 !.env.example
 data
+!configs/data/
 *.txt
 src_rust
 outputs
